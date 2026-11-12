@@ -19,6 +19,19 @@ The gateway must authenticate the owner on the server, verify user authorization
 
 The browser only sends a message when the user disables test mode and submits it. When the future secure endpoint exists, it should accept `{messages:[{role,content},...]}` and return `{reply:"..."}`. No API keys or model endpoints are configured in the public page.
 
+## Local Noorel research studio
+
+The private Noorel repository now has an **optional local-only** mode that can serve this exact `index.html` from an authenticated loopback gateway. The operator runs it on their own trusted workstation with both repositories checked out, a locally generated Noorel checkpoint, and a private `NOOREL_GATEWAY_TOKEN` set outside source control:
+
+```sh
+python -m tools.loopback_gateway --checkpoint-dir runs/noorel-v0 \
+  --leaf-html /path/to/LEAF.github.io/index.html --port 8767 --allow-experimental
+```
+
+Run that command from the private Noorel repository. Then use `http://127.0.0.1:8767/` **on the same machine** to test raw experimental neural responses. The local server enables the inference switch only in its in-memory HTML response, prompts for the local secret on first use, and never changes the public LEAF deployment. Do not enter this token into the public website.
+
+The local model is a research prototype and may answer incoherently. A real trained assistant, a secure public HTTPS session gateway, and cloud conversation persistence have not been commissioned. See `artist1970/noorel.github.io/docs/LEAF-GATEWAY-CHECKPOINT-11.md` for security and operation details.
+
 ## Privacy
 
 Conversation history is stored only in this browser; session-only storage is the default. Enabling “Remember chats on this device” permits local browser persistence. This storage is not encrypted or an Academy account cloud. Anyone with access to the same browser profile may be able to read it. Use Export to retain personal copies; browser/device clearing may erase unsaved messages.
