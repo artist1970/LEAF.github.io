@@ -84,7 +84,7 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
     </div></div>
   </section>
 </main>
-<footer class="footer">NOOREL · LEAF — Original neural research in development · <a href="https://vervenveda.com/">Verve N Veda</a> · <a href="https://github.com/artist1970/noorel.github.io">Private model repository (authorized access)</a></footer>
+<footer class="footer">NOOREL · LEAF — Original neural research in development · <a href="https://vervenveda.com/">Verve N Veda</a> · Private model access requires authentication</footer>
 <script>
 "use strict";
 (() => {
@@ -154,7 +154,7 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
       const article=document.createElement("article");article.className="message "+m.role;
       const avatar=document.createElement("div");avatar.className="avatar";avatar.textContent=m.role==="user"?"Y":"N";avatar.setAttribute("aria-hidden","true");
       const bubble=document.createElement("div");bubble.className="bubble";
-      const meta=document.createElement("div");meta.className="meta";const who=document.createElement("strong");who.textContent=m.role==="user"?"You":"Noorel · interface test";
+      const meta=document.createElement("div");meta.className="meta";const who=document.createElement("strong");who.textContent=m.role==="user"?"You":(m.sample?"Noorel · interface preview":"Noorel");
       const when=document.createElement("time");when.dateTime=m.at;when.textContent=time(m.at);
       meta.append(who,when);const body=document.createElement("div");body.className="body-text";body.textContent=m.text; // no HTML injection
       bubble.append(meta,body);
@@ -189,7 +189,7 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
       } else {
         // GitHub Pages has no private same-origin backend by default.
         // Never send secrets or conversation contents to an arbitrary URL.
-        const res=await fetch(API,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:chat.messages.filter(m=>!m.sample).slice(-24).map(m=>({role:m.role,content:m.text}))})});
+        const res=await fetch(API,{method:"POST",credentials:"same-origin",redirect:"error",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({messages:chat.messages.filter(m=>!m.sample).slice(-24).map(m=>({role:m.role,content:m.text}))})});
         if(!res.ok) throw new Error("Secure Noorel gateway unavailable ("+res.status+")");
         const json=await res.json();
         if(typeof json.reply!=="string" || !json.reply.trim() || json.reply.length>24000) throw new Error("Unexpected private gateway response");
