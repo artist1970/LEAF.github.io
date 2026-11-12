@@ -107,7 +107,8 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
   const MAX_CHATS = 30;
   const MAX_MESSAGES = 300;
   const API = "/api/noorel/chat"; // Only usable when a real same-origin private gateway is deployed.
-  const REAL_GATEWAY_AVAILABLE = false; // Fail closed on static GitHub Pages; do not send user text to a fake endpoint.
+  const REAL_GATEWAY_AVAILABLE = false; // Only a trusted localhost server substitutes true in its in-memory response; public Pages stays disabled.
+  let ephemeralGatewayToken = null; // Never put this in localStorage, sessionStorage, exports or the public source.
   const data = { chats: [], active: null };
   let busy = false;
   const time = iso => new Date(iso).toLocaleString(undefined,{dateStyle:"medium",timeStyle:"short"});
@@ -180,7 +181,7 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
   function render(){renderHistory();renderFeed();setStatus()}
   function setStatus(){
     const test=$("testMode").checked;
-    $("statusText").textContent=test?"Interface test mode · Noorel inference offline":"Neural inference unavailable · private gateway not deployed";
+    $("statusText").textContent=test?"Interface test mode · Noorel inference offline":(REAL_GATEWAY_AVAILABLE?"Local Noorel research gateway · experimental":"Neural inference unavailable · private gateway not deployed");
     $("statusDot").classList.toggle("online",false);
   }
   function sampleReply(input){
@@ -206,7 +207,20 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
         }
         // GitHub Pages has no private same-origin backend by default.
         // Never send secrets or conversation contents to an arbitrary URL.
-        const res=await fetch(API,{method:"POST",credentials:"same-origin",redirect:"error",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({messages:chat.messages.filter(m=>!m.sample).slice(-24).map(m=>({role:m.role,content:m.text}))})});
+        const headers={"Content-Type":"application/json","Accept":"application/json"};
+        if (REAL_GATEWAY_AVAILABLE) {
+          if (!["127.0.0.1","localhost"].includes(location.hostname) || location.protocol !== "http:") {
+            throw new Error("This research gateway is authorized for local browser use only");
+          }
+          if (!ephemeralGatewayToken) {
+            const entered=window.prompt("Enter the temporary Noorel local gateway token from your private workstation. Never enter it on the public LEAF website.");
+            if (!entered || entered.length < 32) throw new Error("Local gateway authentication was not provided");
+            ephemeralGatewayToken=entered;
+          }
+          headers.Authorization="Bearer "+ephemeralGatewayToken;
+        }
+        const res=await fetch(API,{method:"POST",credentials:"same-origin",redirect:"error",headers,body:JSON.stringify({messages:chat.messages.filter(m=>!m.sample).slice(-24).map(m=>({role:m.role,content:m.text}))})});
+        if(res.status===401) ephemeralGatewayToken=null;
         if(!res.ok) throw new Error("Secure Noorel gateway unavailable ("+res.status+")");
         const json=await res.json();
         if(typeof json.reply!=="string" || !json.reply.trim() || json.reply.length>24000) throw new Error("Unexpected private gateway response");
