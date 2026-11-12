@@ -47,6 +47,19 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
 .footer{padding:19px 24px;background:var(--charcoal);color:var(--parchment);text-align:center;font-size:14px}.footer a{color:#e7cf99}
 .mobile-toggle{display:none}
 @media(max-width:850px){.shell{display:block}.sidebar{display:none;border-right:0;border-bottom:1px solid var(--line)}.sidebar.open{display:flex}.mobile-toggle{display:inline-flex}.mast-inner{padding:12px 16px}.brand-title{font-size:22px}.brand-sub{font-size:11px}.top-link{font-size:13px}.hero{padding:19px 16px}.feed{height:54vh;max-height:none}.status-bar{padding:10px 16px}}
+/* Readable VNV / Khaemenes Academy typography across the entire studio */
+.brand-sub,.eyebrow,.side-note,.history small,.status-bar,.meta,.note,.privacy,.footer,.top-link,.btn.tiny,.composer small{font-size:16px;line-height:1.5}
+.brand-title{font-size:29px}.sidebar h2{font-size:24px}
+.hero h1{font-size:clamp(30px,3.2vw,40px)}
+.hero p,.empty p,.suggestion,.history button,.message .body-text,.composer textarea,.btn{font-size:17px}
+.history small,.meta,.note{color:#575c53}
+.brand-sub{color:#e5cfab}
+.composer textarea{min-height:105px}
+.btn.tiny{min-height:44px;padding:9px 12px}
+.status-bar{gap:14px}
+.sidebar{width:100%}
+.feed{min-height:430px}
+@media(max-width:850px){.brand-title{font-size:25px}.brand-sub{font-size:16px}.top-link{font-size:16px}.feed{min-height:370px}}
 @media(prefers-reduced-motion:reduce){.feed{scroll-behavior:auto}}
 </style>
 </head>
@@ -93,7 +106,8 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
   const KEEP = "noorel-leaf-remember-v1";
   const MAX_CHATS = 30;
   const MAX_MESSAGES = 300;
-  const API = "/api/noorel/chat"; // Future authenticated same-origin gateway only.
+  const API = "/api/noorel/chat"; // Only usable when a real same-origin private gateway is deployed.
+  const REAL_GATEWAY_AVAILABLE = false; // Fail closed on static GitHub Pages; do not send user text to a fake endpoint.
   const data = { chats: [], active: null };
   let busy = false;
   const time = iso => new Date(iso).toLocaleString(undefined,{dateStyle:"medium",timeStyle:"short"});
@@ -166,7 +180,7 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
   function render(){renderHistory();renderFeed();setStatus()}
   function setStatus(){
     const test=$("testMode").checked;
-    $("statusText").textContent=test?"Interface test mode · Noorel inference offline":"Private model gateway not connected";
+    $("statusText").textContent=test?"Interface test mode · Noorel inference offline":"Neural inference unavailable · private gateway not deployed";
     $("statusDot").classList.toggle("online",false);
   }
   function sampleReply(input){
@@ -187,6 +201,9 @@ a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px
       if($("testMode").checked){
         chat.messages.push({role:"assistant",text:sampleReply(message),at:new Date().toISOString(),sample:true});
       } else {
+        if (!REAL_GATEWAY_AVAILABLE) {
+          throw new Error("Private Noorel inference service is not commissioned");
+        }
         // GitHub Pages has no private same-origin backend by default.
         // Never send secrets or conversation contents to an arbitrary URL.
         const res=await fetch(API,{method:"POST",credentials:"same-origin",redirect:"error",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify({messages:chat.messages.filter(m=>!m.sample).slice(-24).map(m=>({role:m.role,content:m.text}))})});
