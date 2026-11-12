@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#242622">
+<meta name="description" content="LEAF — the public-facing conversation studio for Noorel, an original neural language model in development.">
+<title>LEAF | Noorel Conversation Studio</title>
+<style>
+:root{--charcoal:#242622;--charcoal2:#30332d;--parchment:#f6f1e6;--paper:#fffcf5;--ink:#292b27;--gold:#ba985c;--line:#d9cdb5;--muted:#656a62;--radius:7px;font-synthesis:none}
+*{box-sizing:border-box}
+html{font-size:16px}body{margin:0;background:var(--parchment);color:var(--ink);font-family:"Nunito","Brandon Grotesque",system-ui,-apple-system,Segoe UI,sans-serif;line-height:1.55}
+button,textarea,input{font:inherit}button{cursor:pointer}button:disabled{cursor:not-allowed;opacity:.55}
+a{color:inherit} :focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.skip{position:absolute;left:-9999px;top:8px;z-index:100;background:white;padding:12px}.skip:focus{left:12px}
+.mast{background:var(--charcoal);color:var(--parchment);border-bottom:3px solid var(--gold)}
+.mast-inner{max-width:1480px;margin:auto;min-height:94px;display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 28px}
+.wordmark{display:flex;gap:14px;align-items:center;text-decoration:none}.sigil{height:49px;width:49px;border:1px solid var(--gold);border-radius:50%;display:grid;place-items:center;font-family:Georgia,serif;color:var(--gold);font-size:30px}
+.brand-title{font:400 26px/1.15 Cinzel,Georgia,serif;letter-spacing:.11em}.brand-sub{font-size:13px;letter-spacing:.12em;color:#d8c39c}
+.mast-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.top-link{border:1px solid #7d7463;border-radius:var(--radius);padding:9px 13px;text-decoration:none;font-size:15px}.top-link:hover{background:#414239}
+.shell{max-width:1480px;margin:auto;min-height:calc(100dvh - 94px - 64px);display:grid;grid-template-columns:290px minmax(0,1fr);gap:0}
+.sidebar{background:#ece4d3;border-right:1px solid var(--line);padding:25px 17px;display:flex;flex-direction:column;gap:18px}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.17em;color:#726444}
+.sidebar h2{font:400 20px/1.3 Cinzel,Georgia,serif;margin:3px 0 10px}.side-note{font-size:14px;color:var(--muted);margin:0}
+.btn{border:1px solid var(--charcoal);border-radius:var(--radius);padding:10px 14px;background:var(--charcoal);color:var(--paper);min-height:44px}.btn:hover:not(:disabled){background:#414339}
+.btn.secondary{background:transparent;color:var(--ink);border-color:#9f947f}.btn.secondary:hover:not(:disabled){background:#ded4c0}
+.btn.tiny{padding:6px 10px;min-height:36px;font-size:14px}
+.btn.full{width:100%}.tool-row{display:flex;gap:8px;flex-wrap:wrap}
+.history{display:flex;flex-direction:column;gap:5px;max-height:36vh;overflow:auto;min-height:60px}.history button{background:transparent;border:1px solid transparent;border-radius:var(--radius);padding:10px;text-align:left;color:var(--ink);overflow-wrap:anywhere}.history button:hover,.history button[aria-current="true"]{background:#fff8eb;border-color:var(--line)}.history small{display:block;color:var(--muted);font-size:12px}
+.sidebar-bottom{margin-top:auto;border-top:1px solid #cdbf9f;padding-top:14px;display:flex;flex-direction:column;gap:9px}
+.workspace{min-width:0;display:flex;flex-direction:column;background:var(--paper)}
+.hero{text-align:center;border-bottom:1px solid var(--line);padding:23px 28px 18px;background:linear-gradient(180deg,#f5efe1,var(--paper));}
+.hero h1{font:400 clamp(27px,3vw,39px)/1.2 Cinzel,Georgia,serif;margin:7px 0 6px;letter-spacing:.06em}.hero p{margin:0 auto;max-width:850px;color:var(--muted)}
+.status-bar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:10px 24px;border-bottom:1px solid var(--line);background:#f8f3e9;font-size:14px;color:var(--muted)}
+.status{display:inline-flex;align-items:center;gap:7px}.dot{width:9px;height:9px;border-radius:50%;background:#bd9056;display:inline-block}.dot.online{background:#58745a}
+.feed{flex:1;height:clamp(350px,55vh,690px);min-height:350px;max-height:70vh;overflow:auto;padding:23px clamp(16px,4vw,58px);scroll-behavior:smooth;overscroll-behavior:contain}
+.empty{text-align:center;max-width:680px;margin:55px auto 20px}.empty .orb{border:1px solid var(--gold);height:80px;width:80px;border-radius:50%;display:grid;place-items:center;margin:auto;color:var(--gold);font:400 46px Georgia,serif}.empty h2{font:400 25px Cinzel,Georgia,serif}.empty p{color:var(--muted)}
+.suggestions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:20px}.suggestion{background:#f4ecdd;border:1px solid var(--line);border-radius:var(--radius);padding:11px 14px;color:var(--ink)}
+.message{max-width:850px;margin:0 auto 24px;display:flex;gap:14px;align-items:flex-start}.avatar{flex:none;width:36px;height:36px;background:var(--charcoal);color:var(--gold);border-radius:50%;display:grid;place-items:center;font:400 21px Georgia,serif}.message.user .avatar{background:#dbc9a7;color:var(--charcoal)}
+.bubble{min-width:0;flex:1}.meta{display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:5px}.meta strong{font-weight:600;color:var(--ink);font-size:15px}
+.body-text{white-space:pre-wrap;overflow-wrap:anywhere;font-size:16px}.message.user .body-text{background:#f0e7d7;padding:14px;border:1px solid #e4d8c2;border-radius:var(--radius)}
+.message.assistant .body-text{padding:8px 0}.note{font-size:12px;color:#7a6651;margin-top:6px}
+.composer-wrap{padding:15px clamp(16px,4vw,58px) 24px;background:var(--paper);border-top:1px solid var(--line)}.composer-inner{max-width:850px;margin:auto}
+.composer{border:1px solid #b9ae98;border-radius:var(--radius);background:#fff;box-shadow:0 3px 14px #27221a0b;padding:10px}.composer textarea{display:block;width:100%;border:0;outline:0;resize:vertical;min-height:75px;max-height:230px;padding:9px;background:transparent;color:var(--ink);font-size:16px}
+.composer-actions{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.composer small{color:var(--muted)}.send{min-width:113px}
+.privacy{font-size:13px;color:var(--muted);margin:9px 0 0;text-align:center}
+.footer{padding:19px 24px;background:var(--charcoal);color:var(--parchment);text-align:center;font-size:14px}.footer a{color:#e7cf99}
+.mobile-toggle{display:none}
+@media(max-width:850px){.shell{display:block}.sidebar{display:none;border-right:0;border-bottom:1px solid var(--line)}.sidebar.open{display:flex}.mobile-toggle{display:inline-flex}.mast-inner{padding:12px 16px}.brand-title{font-size:22px}.brand-sub{font-size:11px}.top-link{font-size:13px}.hero{padding:19px 16px}.feed{height:54vh;max-height:none}.status-bar{padding:10px 16px}}
+@media(prefers-reduced-motion:reduce){.feed{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<a class="skip" href="#conversation">Skip to conversation</a>
+<header class="mast">
+  <div class="mast-inner">
+    <a class="wordmark" href="./" aria-label="Noorel LEAF home"><span class="sigil" aria-hidden="true">N</span><span><span class="brand-title">NOOREL · LEAF</span><span class="brand-sub" style="display:block">VERVE N VEDA · KHAEMENES ACADEMY</span></span></a>
+    <div class="mast-actions"><button id="menuToggle" class="btn tiny mobile-toggle" type="button" aria-expanded="false" aria-controls="sidebar">Conversations</button><a class="top-link" href="https://vervenveda.com/">VNV Gateway</a><a class="top-link" href="https://github.com/artist1970/LEAF.github.io">Repository</a></div>
+  </div>
+</header>
+<main class="shell">
+  <aside class="sidebar" id="sidebar" aria-label="Conversation library">
+    <div><div class="eyebrow">Conversation library</div><h2>Your workspace</h2><button id="newChat" type="button" class="btn full">+ New conversation</button></div>
+    <div><div class="eyebrow">This browser</div><div class="history" id="history" aria-label="Saved conversations"></div></div>
+    <div class="sidebar-bottom">
+      <div class="tool-row"><button id="exportJson" class="btn secondary tiny" type="button">Export JSON</button><button id="exportText" class="btn secondary tiny" type="button">Export text</button></div>
+      <div class="tool-row"><button id="clearChat" class="btn secondary tiny" type="button">Clear conversation</button><button id="clearAll" class="btn secondary tiny" type="button">Clear all</button></div>
+      <label style="font-size:14px;display:flex;align-items:center;gap:8px"><input id="remember" type="checkbox"> Remember chats on this device</label>
+      <p class="side-note">Off by default. Without it, conversations are kept only for this browser tab. Do not use persistent storage on a shared device.</p>
+    </div>
+  </aside>
+  <section class="workspace" aria-label="Noorel conversation studio">
+    <div class="hero"><div class="eyebrow">Language · Exploration · Connection</div><h1>Converse with Noorel</h1><p>Your independent neural language model's conversation studio. A thoughtful interface for dialogue, research, and future private inference.</p></div>
+    <div class="status-bar"><span class="status"><span class="dot" id="statusDot" aria-hidden="true"></span><span id="statusText">Interface preview · model gateway not connected</span></span><span>Public interface · Private model boundary</span></div>
+    <div class="feed" id="conversation" role="log" aria-label="Conversation messages" aria-live="polite" aria-relevant="additions text"></div>
+    <div class="composer-wrap"><div class="composer-inner">
+      <form id="messageForm" class="composer">
+        <label for="messageInput" class="eyebrow" style="display:block;padding:5px 9px">Message</label>
+        <textarea id="messageInput" maxlength="12000" placeholder="Ask Noorel a question…" aria-label="Your message to Noorel" required></textarea>
+        <div class="composer-actions"><small>Enter to send · Shift+Enter for a new line</small><button type="submit" class="btn send" id="sendButton">Send</button></div>
+      </form>
+      <p class="privacy">No neural model is connected yet. Use the interface test below to verify the chat layout. Nothing is transmitted in test mode.</p>
+      <div style="text-align:center;margin-top:8px"><label style="display:inline-flex;gap:8px;align-items:center;color:var(--muted);font-size:14px"><input type="checkbox" id="testMode" checked> Interface test mode (clearly labeled sample replies)</label></div>
+    </div></div>
+  </section>
+</main>
+<footer class="footer">NOOREL · LEAF — Original neural research in development · <a href="https://vervenveda.com/">Verve N Veda</a> · <a href="https://github.com/artist1970/noorel.github.io">Private model repository (authorized access)</a></footer>
+<script>
+"use strict";
+(() => {
+  const $ = id => document.getElementById(id);
+  const KEY = "noorel-leaf-chat-v1";
+  const KEEP = "noorel-leaf-remember-v1";
+  const MAX_CHATS = 30;
+  const MAX_MESSAGES = 300;
+  const API = "/api/noorel/chat"; // Future authenticated same-origin gateway only.
+  const data = { chats: [], active: null };
+  let busy = false;
+  const time = iso => new Date(iso).toLocaleString(undefined,{dateStyle:"medium",timeStyle:"short"});
+  const uid = () => globalThis.crypto?.randomUUID?.() || (Date.now().toString(36)+"-"+Math.random().toString(36).slice(2));
+  const persistent = () => $("remember").checked;
+  function read() {
+    try {
+      $("remember").checked = localStorage.getItem(KEEP) === "yes";
+      const store = persistent() ? localStorage : sessionStorage;
+      const obj = JSON.parse(store.getItem(KEY) || "null");
+      if (obj && Array.isArray(obj.chats)) {
+        data.chats = obj.chats.filter(c => c && typeof c.id === "string" && Array.isArray(c.messages)).slice(0,MAX_CHATS).map(c => ({
+          id:c.id, title:String(c.title||"Conversation").slice(0,75),
+          messages:c.messages.filter(m=>m && ["user","assistant"].includes(m.role) && typeof m.text==="string").slice(-MAX_MESSAGES).map(m=>({role:m.role,text:m.text.slice(0,12000),at:m.at||new Date().toISOString(),sample:Boolean(m.sample)}))
+        }));
+        data.active = data.chats.some(c=>c.id===obj.active)?obj.active:null;
+      }
+    } catch(e) { console.warn("Chat storage unavailable",e); }
+  }
+  function save() {
+    try {
+      const store = persistent()?localStorage:sessionStorage;
+      store.setItem(KEY,JSON.stringify(data));
+      (persistent()?sessionStorage:localStorage).removeItem(KEY);
+    } catch(e) { console.warn("Chat storage unavailable",e); }
+  }
+  function current(){return data.chats.find(c=>c.id===data.active)}
+  function createChat() {
+    if(data.chats.length>=MAX_CHATS) data.chats.pop();
+    const c={id:uid(),title:"New conversation",messages:[]};
+    data.chats.unshift(c);data.active=c.id;save();render();$("messageInput").focus();
+  }
+  function renderHistory() {
+    const list=$("history"); list.replaceChildren();
+    for (const c of data.chats){
+      const b=document.createElement("button");b.type="button";b.setAttribute("aria-current",String(c.id===data.active));
+      const title=document.createElement("span");title.textContent=c.title;
+      const sub=document.createElement("small");sub.textContent=c.messages.length+" messages";
+      b.append(title,sub);b.addEventListener("click",()=>{data.active=c.id;save();render();$("sidebar").classList.remove("open");$("menuToggle").setAttribute("aria-expanded","false")});list.append(b);
+    }
+  }
+  function renderFeed() {
+    const feed=$("conversation"); feed.replaceChildren();
+    const chat=current(); if(!chat) return;
+    if(!chat.messages.length){
+      const empty=document.createElement("div");empty.className="empty";
+      const orb=document.createElement("div");orb.className="orb";orb.textContent="N";orb.setAttribute("aria-hidden","true");
+      const title=document.createElement("h2");title.textContent="Welcome to your Noorel studio";
+      const desc=document.createElement("p");desc.textContent="This is your official public-facing conversation interface. Test its features today; neural responses will require a secure private model gateway.";
+      const suggestions=document.createElement("div");suggestions.className="suggestions";
+      for(const prompt of ["Hello, Noorel","What can this studio do?","How do I save our conversation?"]){
+        const b=document.createElement("button");b.type="button";b.className="suggestion";b.textContent=prompt;b.addEventListener("click",()=>{$("messageInput").value=prompt;$("messageInput").focus()});suggestions.append(b);
+      }
+      empty.append(orb,title,desc,suggestions);feed.append(empty);return;
+    }
+    const fragment=document.createDocumentFragment();
+    for(const m of chat.messages){
+      const article=document.createElement("article");article.className="message "+m.role;
+      const avatar=document.createElement("div");avatar.className="avatar";avatar.textContent=m.role==="user"?"Y":"N";avatar.setAttribute("aria-hidden","true");
+      const bubble=document.createElement("div");bubble.className="bubble";
+      const meta=document.createElement("div");meta.className="meta";const who=document.createElement("strong");who.textContent=m.role==="user"?"You":"Noorel · interface test";
+      const when=document.createElement("time");when.dateTime=m.at;when.textContent=time(m.at);
+      meta.append(who,when);const body=document.createElement("div");body.className="body-text";body.textContent=m.text; // no HTML injection
+      bubble.append(meta,body);
+      if(m.sample){const note=document.createElement("div");note.className="note";note.textContent="Sample interface reply — not generated by the Noorel neural model.";bubble.append(note)}
+      article.append(avatar,bubble);fragment.append(article);
+    }
+    feed.append(fragment);feed.scrollTop=feed.scrollHeight;
+  }
+  function render(){renderHistory();renderFeed();setStatus()}
+  function setStatus(){
+    const test=$("testMode").checked;
+    $("statusText").textContent=test?"Interface test mode · Noorel inference offline":"Private model gateway not connected";
+    $("statusDot").classList.toggle("online",false);
+  }
+  function sampleReply(input){
+    const t=input.toLowerCase();
+    if(/\b(save|export|download)\b/.test(t)) return "You can export this conversation using the buttons in the left panel. For storage on this device, enable 'Remember chats on this device'.";
+    if(/\b(what|features|studio|can you)\b/.test(t)) return "This studio has a scrollable conversation feed, timestamps, multiple conversations, export, and optional local persistence. The actual Noorel neural model is not connected yet.";
+    return "Hello. This reply demonstrates the Noorel chat interface only. A secure private inference gateway must be commissioned before I can respond with real neural language-model output.";
+  }
+  async function submit(event){
+    event.preventDefault();if(busy)return;const input=$("messageInput");const message=input.value.trim();if(!message)return;
+    if(message.length>12000)return;
+    let chat=current();if(!chat){createChat();chat=current()}
+    if(chat.messages.length>=MAX_MESSAGES){alert("This conversation has reached its message limit. Export it and begin a new one.");return}
+    chat.messages.push({role:"user",text:message,at:new Date().toISOString(),sample:false});
+    if(chat.title==="New conversation")chat.title=message.slice(0,64);
+    input.value="";save();render();busy=true;$("sendButton").disabled=true;
+    try{
+      if($("testMode").checked){
+        chat.messages.push({role:"assistant",text:sampleReply(message),at:new Date().toISOString(),sample:true});
+      } else {
+        // GitHub Pages has no private same-origin backend by default.
+        // Never send secrets or conversation contents to an arbitrary URL.
+        const res=await fetch(API,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:chat.messages.filter(m=>!m.sample).slice(-24).map(m=>({role:m.role,content:m.text}))})});
+        if(!res.ok) throw new Error("Secure Noorel gateway unavailable ("+res.status+")");
+        const json=await res.json();
+        if(typeof json.reply!=="string" || !json.reply.trim() || json.reply.length>24000) throw new Error("Unexpected private gateway response");
+        chat.messages.push({role:"assistant",text:json.reply,at:new Date().toISOString(),sample:false});
+      }
+    }catch(error){
+      chat.messages.push({role:"assistant",text:"No neural response was generated. "+error.message+". This public page cannot directly access a private model. Your message remains in this browser only unless the authenticated gateway is configured.",at:new Date().toISOString(),sample:true});
+    }finally{busy=false;$("sendButton").disabled=false;save();render();input.focus()}
+  }
+  function exportChat(type){
+    const chat=current();if(!chat)return;
+    const content=type==="json" ? JSON.stringify({schema:"noorel-leaf-export-v1",exportedAt:new Date().toISOString(),conversation:chat},null,2) :
+      "# "+chat.title+"\n\n"+chat.messages.map(m=>"## "+(m.role==="user"?"You":"Noorel")+(m.sample?" (interface sample)":"")+" — "+time(m.at)+"\n\n"+m.text).join("\n\n");
+    const blob=new Blob([content],{type:type==="json"?"application/json":"text/markdown"});
+    const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download="noorel-conversation-"+new Date().toISOString().replace(/[:.]/g,"-")+"."+(type==="json"?"json":"md");link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }
+  $("messageForm").addEventListener("submit",submit);
+  $("messageInput").addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();$("messageForm").requestSubmit()}});
+  $("newChat").addEventListener("click",createChat);
+  $("exportJson").addEventListener("click",()=>exportChat("json"));
+  $("exportText").addEventListener("click",()=>exportChat("text"));
+  $("clearChat").addEventListener("click",()=>{const c=current();if(c&&confirm("Delete messages in this conversation from this browser?")){c.messages=[];save();render()}});
+  $("clearAll").addEventListener("click",()=>{if(confirm("Delete all LEAF conversations stored in this browser?")){data.chats=[];data.active=null;save();createChat()}});
+  $("testMode").addEventListener("change",setStatus);
+  $("remember").addEventListener("change",()=>{
+    try{if(persistent()){localStorage.setItem(KEEP,"yes")}else{localStorage.removeItem(KEEP)}}catch(e){console.warn("Preference storage unavailable",e)}
+    save();
+  });
+  $("menuToggle").addEventListener("click",()=>{const open=$("sidebar").classList.toggle("open");$("menuToggle").setAttribute("aria-expanded",String(open))});
+  read();if(!current())createChat();else render();
+})();
+</script>
+</body>
+</html>
